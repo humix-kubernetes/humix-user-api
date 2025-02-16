@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client"
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
+import { generateToken } from "./jwt"
 
 const userClient = new PrismaClient().user
 
@@ -42,7 +43,34 @@ export const registrarUsuario = async (req: Request, res: Response) => {
 }
 
 // logar usuário
+export const logarUsuario = async (req: Request, res: Response) => {
 
+    const {email, senha} = req.body
+
+    try{
+        const usuario = await userClient.findUnique({where: {email: email}})
+
+        if (!usuario){
+            res.status(400).json({message: "usuário não cadastrado"})
+            return
+        }
+
+        const isValidSenha = await bcrypt.compare(senha, usuario.senha)
+
+        if(!isValidSenha){
+            res.status(401).json({messagem: "senha incorreta"})
+            return
+        }
+
+        const accessToken = generateToken({id: usuario.id, nome: usuario.nome, email: usuario.email, senha: usuario.senha})
+        res.status(200).json({message: "usuário logado", toke: accessToken})
+    }
+    
+    
+    catch(err){
+        res.status(400).json({error: err})
+    }
+}
 
 // pegar informações do usuário
 
@@ -52,8 +80,6 @@ export const registrarUsuario = async (req: Request, res: Response) => {
 
 
 // funções
-
-
 
 function isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
