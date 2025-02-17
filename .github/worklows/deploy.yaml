@@ -1,0 +1,49 @@
+name: CD
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Fazendo Checkout do código
+              uses: actions/checkout@v2
+
+            - name: Construindo e publicando a imagem
+              uses: docker/build-push-action@v1.1.0
+              with: 
+                username: blgianinis
+                password: ${{ secrets.DOCKER_PASSWORD }}
+                repository: blgianinis/humix-user-api
+                tags: ${{ github.sha }}, latest
+    
+    deply:
+        name: Deploy
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+            - name: Fazendo Checkout do código
+              uses: actions/checkout@v2
+            
+            - name: Rodando o Kustomize
+              uses: imranismail/setup-kustomize@v1
+              with:
+                kustomize_version: v3.6.1
+            
+            - name: Atualizando os valores da imagem
+              run: |
+                cd k8s
+                kustomize edit set image humix-user-api=blgianinis/humix-user-api:${{ github.sha }}
+            
+            - name: Criando commit da tag nova da imagem
+              run: |
+                git config --local user.email "action@github.com"
+                git config --local user.name "Deploy Action"
+                git commit -am "change image tag"
+            
+            - name: Fazendo push da nova versão da imagem
+              uses: ad-m/github-push-action@master

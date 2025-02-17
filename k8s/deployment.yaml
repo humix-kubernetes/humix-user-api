@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: humix-user-api
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: humix-user-api
+  template:
+    metadata:
+      labels:
+        app: humix-user-api
+    spec:
+      containers:
+      - name: humix-user-api
+        image: humix-user-api
+        ports:
+        - containerPort: 8080
