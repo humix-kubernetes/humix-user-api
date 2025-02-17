@@ -38,7 +38,7 @@ export const registrarUsuario = async (req: Request, res: Response) => {
     
     
     catch(err){
-        res.status(400).json({error: err})
+        res.status(500).json({error: err})
     }
 }
 
