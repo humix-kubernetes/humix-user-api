@@ -1,23 +1,30 @@
-# Build stage
-FROM node:20-alpine AS build
+# Etapa 1: Build
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json . 
-
+# Copia os arquivos essenciais
+COPY package.json package-lock.json ./
 RUN npm install
 
 COPY . .
 
+# Gera os tipos do Prisma e compila o TypeScript
+RUN npx prisma generate
 RUN npm run build
 
-# Production stage
-FROM node:20-alpine AS production
+# Etapa 2: Runtime
+FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json . 
+# Copia apenas os arquivos necessários do builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package.json ./
 
-COPY --from=build /app/dist ./dist
+# Executa prisma generate no post build
+RUN npx prisma generate
 
 CMD ["node", "dist/index.js"]

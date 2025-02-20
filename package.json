@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "migrate": "prisma migrate dev",
-    "postinstall": "prisma generate",
-    "build": "prisma generate & tsc "
+    "build": "tsc "
   },
   "keywords": [],
   "author": "",
