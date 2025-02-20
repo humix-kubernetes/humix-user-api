@@ -9,4 +9,4 @@ namespace: user
 images:
 - name: humix-user-api
   newName: blgianinis/humix-user-api
-  newTag: 85370cc8994b810c1144145f5fc6c703e7fbeb9c
+  newTag: 00275f25d65bfb2a304e433ecf799602a6284092
