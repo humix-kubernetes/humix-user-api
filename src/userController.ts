@@ -33,6 +33,7 @@ export const registrarUsuario = async (req: Request, res: Response) => {
         const usuario = await userClient.create({data: {nome, email, senha: hashedSenha as unknown as string}})
 
         res.status(201).json({data: usuario})
+        console.log("Usuário registrado")
 
     }
     
@@ -64,6 +65,7 @@ export const logarUsuario = async (req: Request, res: Response) => {
 
         const accessToken = generateToken({id: usuario.id, nome: usuario.nome, email: usuario.email, senha: usuario.senha})
         res.status(200).json({message: "usuário logado", toke: accessToken})
+        console.log("Usuário logado")
     }
     
     
